@@ -8,7 +8,7 @@ name := "scoobi"
 
 organization := "com.nicta"
 
-version := "0.5.0-cdh3-SNAPSHOT"
+version := "0.5.0-cdh3"
 
 scalaVersion := "2.9.2"
 
@@ -116,6 +116,8 @@ git.remoteRepo := "git@github.com:NICTA/scoobi.git"
 
 /** Notification */
 seq(lsSettings :_*)
+
+(LsKeys.ghBranch in LsKeys.lsync) := Some("cdh3-publish")
 
 (LsKeys.ghUser in LsKeys.lsync) := Some("nicta")
 
