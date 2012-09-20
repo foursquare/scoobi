@@ -61,11 +61,12 @@ object WordCount extends ScoobiApp {
 
     // we start off by generating count/10 different "words"
     var words: IndexedSeq[String] =
-    	for (i <- 1 to count/10)
-    		yield randomWord()
+      for (i <- 1 to count/10)
+        yield randomWord()
 
     // and now we will pick 'count' of them to output
     for (i <- 1 to count)
-    	yield words(r.nextInt(words.length))	
+      yield words(r.nextInt(words.length))	
   }
 }
+
