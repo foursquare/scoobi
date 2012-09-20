@@ -11,11 +11,7 @@ import sbt._
  */
 object GenWireFormat {
   def gen(dir: File) = {
-<<<<<<< HEAD
      val place = dir / "scoobi" / "codegen" / "GeneratedWireFormats.scala"
-=======
-     val place = dir / "soobi" / "codegen" / "GeneratedWireFormats.scala"
->>>>>>> origin/master-publish
      IO.write(place,
 """package com.nicta.scoobi.codegen
 import com.nicta.scoobi.core.WireFormat
