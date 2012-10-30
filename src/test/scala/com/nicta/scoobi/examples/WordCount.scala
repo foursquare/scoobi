@@ -21,9 +21,10 @@ import Scoobi._
 /**
  * This application is duplicated from the examples directory to ease testing from within sbt. Run with:
  *
- * `test:run-main com.nicta.scoobi.examples.WordCount -- scoobi local.all`
+ * `test:run-main com.nicta.scoobi.examples.WordCount`
  */
 object WordCount extends ScoobiApp {
+
   def run() {
     // Firstly we load up all the (new-line-separated) words into a DList
     val lines: DList[String] =
