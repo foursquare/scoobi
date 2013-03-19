@@ -3,7 +3,7 @@ name := "scoobi"
 
 organization := "com.nicta"
 
-version := "0.5.0-cdh4-fs-a"
+version := "0.5.0-cdh4-fs-b"
 
 scalaVersion := "2.9.2"
 
