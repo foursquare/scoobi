@@ -125,7 +125,7 @@ trait Environment {
    * Return the value of a counter.  NOTE: May not reflect latest updates
    * to the counter, especially when done in other tasks.
    */
-  def getCounter(group: String, name: String): Long =
+  def getCounter(group: String, name: String)(implicit c: ScoobiConfiguration): Long =
     ScoobiEnvironment.getCounter(group, name)
 
   /**

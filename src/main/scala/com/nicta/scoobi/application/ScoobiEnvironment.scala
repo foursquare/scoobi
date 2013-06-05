@@ -81,14 +81,17 @@ object ScoobiEnvironment {
    * Find the Counter object for the given counter.  The way to do this
    * depends on whether we're running on the job tracker, or in a map or
    * reduce task on a task tracker.
+   * if ScoobiConfiguration is provided it will also check for cached counters.
    */
-  def findCounter(group: String, counter: String): Counter = {
+  def findCounter(group: String, counter: String, conf: Option[ScoobiConfiguration] = None): Counter = {
     if (taskContext != null)
       taskContext.getCounter(group, counter)
     else if (job != null)
       job.getCounters.findCounter(group, counter)
     else
-      needToSetContext()
+      conf.map{c =>
+        c.counters.findCounter(group, counter)
+      }.getOrElse(needToSetContext())
   }
 
   private def needToSetContext() =
@@ -109,8 +112,8 @@ object ScoobiEnvironment {
    * Return the value of a counter.  NOTE: May not reflect latest updates
    * to the counter, especially when done in other tasks.
    */
-  def getCounter(group: String, name: String): Long = {
-    val counter = findCounter(group, name)
+  def getCounter(group: String, name: String)(implicit conf: ScoobiConfiguration): Long = {
+    val counter = findCounter(group, name, Some(conf))
     counter.getValue()
   }
 
