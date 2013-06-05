@@ -307,6 +307,7 @@ class MapReduceJob(stepId: Int) {
         }
       }
     }
+    configuration.updateCounters(job.getCounters)
     fs.delete(configuration.temporaryOutputDirectory, true)
     job
   }

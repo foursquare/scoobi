@@ -1,6 +1,4 @@
 resolvers += "jgit-repo" at "http://download.eclipse.org/jgit/maven"
-
-addSbtPlugin("com.jsuereth" % "xsbt-gpg-plugin" % "0.6")
     
 addSbtPlugin("com.jsuereth" % "sbt-site-plugin" % "0.4.0")
 

@@ -23,6 +23,7 @@ import org.apache.hadoop.fs.Path
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.util.GenericOptionsParser
 import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.mapreduce.{Counters => HadoopCounters, Counter}
 import Configurations._
 import java.net.URL
 import org.apache.hadoop.mapred.JobConf
@@ -34,6 +35,7 @@ import impl.reflect.Classes
 import org.apache.commons.logging.LogFactory
 import LogFactory._
 import impl.monitor.Loggable._
+import scala.collection.JavaConversions._
 /**
  * This class wraps the Hadoop (mutable) configuration with additional configuration information such as the jars which should be
  * added to the classpath.
@@ -276,6 +278,16 @@ case class ScoobiConfiguration(configuration: Configuration = new Configuration,
 
   /** @return the file system for this configuration, either a local or a remote one */
   def fileSystem = FileSystems.fileSystem(this)
+
+  val counters = new HadoopCounters()
+
+  def updateCounters(hadoopCounters: HadoopCounters): ScoobiConfiguration = {
+    hadoopCounters.getGroupNames.map { groupName: String =>
+      val group = hadoopCounters.getGroup(groupName)
+      group.iterator.foreach((c: Counter) => counters.findCounter(groupName, c.getName).increment(c.getValue))
+    }
+    this
+  }
 }
 
 object ScoobiConfiguration {
