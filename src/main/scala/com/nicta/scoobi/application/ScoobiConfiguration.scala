@@ -282,15 +282,9 @@ case class ScoobiConfiguration(configuration: Configuration = new Configuration,
   val counters = new HadoopCounters()
 
   def updateCounters(hadoopCounters: HadoopCounters): ScoobiConfiguration = {
-    val prefix = counters.findCounter("job", "step").getValue()
-    counters.findCounter("job", "step").increment(1)
-
     hadoopCounters.getGroupNames.map { groupName: String =>
       val group = hadoopCounters.getGroup(groupName)
-      group.iterator.foreach((c: Counter) => {
-        counters.findCounter(groupName, c.getName).increment(c.getValue)
-        counters.findCounter(prefix + " " + groupName, c.getName).increment(c.getValue)
-      })
+      group.iterator.foreach((c: Counter) => counters.findCounter(groupName, c.getName).increment(c.getValue))
     }
     this
   }
