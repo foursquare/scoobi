@@ -55,14 +55,14 @@ class MscrMapper[K1, V1, A, E, K2, V2] extends HMapper[K1, V1, TaggedKey, Tagged
 
     mappers = input._2 map { case (env, mapper) => (env.pull(context.getConfiguration), mapper) }
 
-    mappers.foreach { case (env, mapper: TaggedMapper[_, _, _, _]) =>
+    mappers.foreach { case (env: Any, mapper: TaggedMapper[_, Any, _, _]) =>
       mapper.setup(env)
     }
   }
 
   override def map(key: K1, value: V1, context: HMapper[K1, V1, TaggedKey, TaggedValue]#Context) = {
     val v: A = converter.fromKeyValue(context, key, value).asInstanceOf[A]
-    mappers foreach { case (env, mapper: TaggedMapper[_, _, _, _]) =>
+    mappers foreach { case (env: Any, mapper: TaggedMapper[_, Any, K2, V2]) =>
       val emitter = new Emitter[(K2, V2)] {
         def emit(x: (K2, V2)) = {
           mapper.tags.foreach { tag =>
@@ -77,7 +77,7 @@ class MscrMapper[K1, V1, A, E, K2, V2] extends HMapper[K1, V1, TaggedKey, Tagged
   }
 
   override def cleanup(context: HMapper[K1, V1, TaggedKey, TaggedValue]#Context) = {
-    mappers foreach { case (env, mapper: TaggedMapper[_, _, _, _]) =>
+    mappers foreach { case (env: Any, mapper: TaggedMapper[_, Any, K2, V2]) =>
       val emitter = new Emitter[(K2, V2)] {
         def emit(x: (K2, V2)) = {
           mapper.tags.foreach { tag =>

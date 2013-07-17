@@ -37,6 +37,7 @@ abstract case class TaggedMapper[A, E, K, V]
   def setup(env: E)
   def map(env: E, input: A, emitter: Emitter[(K, V)])
   def cleanup(env: E, emitter: Emitter[(K, V)])
+  type Foo = E
 }
 
 

@@ -19,6 +19,7 @@ package lib
 import Scoobi._
 import scala.collection.mutable.ArrayBuffer
 import LinearAlgebra._
+import com.nicta.scoobi.core.WireFormat
 
 /**
  * A distributed vector, stored in coordinate form.
@@ -83,7 +84,7 @@ case class InMemDenseVector[T: WireFormat: Manifest](data: DObject[IndexedSeq[T]
  * must be small enough to fit in memory
  */
 case class DRowWiseMatrix[Elem: Manifest: WireFormat: Ordering, T: Manifest: WireFormat](data: DList[(Elem, Iterable[(Elem, T)])]) {
-  
+
   def byVector[V, R](
     dv: InMemDenseVector[V],
     zero: R,
@@ -93,7 +94,7 @@ case class DRowWiseMatrix[Elem: Manifest: WireFormat: Ordering, T: Manifest: Wir
       vw: WireFormat[V],
       rm: Manifest[R],
       rw: WireFormat[R]): InMemDenseVector[R] = matrixByVector(this, dv, zero, mult, add)
-      
+
   def byVector[V: Manifest: WireFormat, R: Manifest: WireFormat](
     dv: InMemVector[Elem, V],
     mult: (T, V) => R,
@@ -140,15 +141,19 @@ case class DMatrix[Elem: Manifest: WireFormat: Ordering, Value: Manifest: WireFo
     mult: (Value, V) => R,
     add: (R, R) => R): InMemVector[Elem, R] =
     matrixByVector(this, dv, mult, add)
-    
-    
+
+
   def byVector[V: Manifest: WireFormat, Q: Manifest: WireFormat: Ordering](
     v: DVector[Elem, V],
     mult: (Value, V) => Q,
     add: (Q, Q) => Q): DVector[Elem, Q] = matrixByVector(this, v, mult, add)
 
 
-  def transpose: DMatrix[Elem, Value] = DMatrix(this.data map { case ((r, c), v) => ((c, r), v) })
+  def transpose: DMatrix[Elem, Value] = {
+    type Foo = ((Elem, Elem), Value)
+    implicit val wf = WireFormat.Tuple2Fmt(implicitly[WireFormat[(Elem, Elem)]], implicitly[WireFormat[Value]])
+    DMatrix(this.data.map[Foo]({ case ((r, c), v) => ((c, r), v) })(manifest[Foo], wf))
+  }
 }
 
 object LinearAlgebra {

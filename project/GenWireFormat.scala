@@ -101,7 +101,7 @@ trait GeneratedWireFormats {
     def gen_call_types = gen("%C", ", ")
     def gen_toWire = {
       def gen_if_else = gen4(
-      """if (clazz == implicitly[Manifest[%c]].erasure) {
+      """if (clazz == implicitly[Manifest[%c]].runtimeClass) {
         out.writeInt('%c')
         implicitly[WireFormat[%c]].toWire(obj.asInstanceOf[%c], out)
       }""", " else ")

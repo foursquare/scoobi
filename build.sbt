@@ -8,9 +8,9 @@ name := "scoobi"
 
 organization := "com.nicta"
 
-version := "0.6.2-cdh4-fs-e"
+version := "0.6.2-cdh4-fs-f"
 
-scalaVersion := "2.9.2"
+scalaVersion := "2.10.2"
 
 libraryDependencies ++= Seq(
   "javassist" % "javassist" % "3.12.1.GA",
@@ -19,11 +19,11 @@ libraryDependencies ++= Seq(
   "org.apache.hadoop" % "hadoop-client" % "2.0.0-mr1-cdh4.0.1",
   "org.apache.hadoop" % "hadoop-core" % "2.0.0-mr1-cdh4.0.1",
   "com.thoughtworks.xstream" % "xstream" % "1.4.3" intransitive(),
-  "org.scalaz" %% "scalaz-core" % "7.0.0-M3",
-  "org.specs2" %% "specs2" % "1.12.3" % "optional",
-  "com.chuusai" %% "shapeless" % "1.2.2",
+  "org.scalaz" %% "scalaz-core" % "7.0.2",
+  "org.specs2" %% "specs2" % "2.0" % "optional",
+  "com.chuusai" %% "shapeless" % "1.2.4",
   "org.specs2" % "classycle" % "1.4.1"% "test",
-  "org.scalacheck" %% "scalacheck" % "1.9" % "test",
+  "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
   "org.scala-tools.testing" % "test-interface" % "0.5" % "test",
   "org.hamcrest" % "hamcrest-all" % "1.1" % "test",
   "org.mockito" % "mockito-all" % "1.9.0" % "optional",
@@ -40,7 +40,7 @@ resolvers ++= Seq("nicta's avro" at "http://nicta.github.com/scoobi/releases",
                   "sonatype" at "http://oss.sonatype.org/content/repositories/snapshots")
 
 /** Compilation */
-scalacOptions ++= Seq("-deprecation", "-Ydependent-method-types", "-unchecked")
+scalacOptions ++= Seq("-deprecation", "-unchecked")
 
 /** Testing */
 testOptions := Seq(Tests.Filter(s => s.endsWith("Spec") ||
