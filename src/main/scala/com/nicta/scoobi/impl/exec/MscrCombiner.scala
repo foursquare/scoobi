@@ -21,6 +21,7 @@ import org.apache.hadoop.mapreduce.{Reducer => HReducer}
 import scala.collection.JavaConversions._
 
 import rtt._
+import application.ScoobiEnvironment
 
 /** Hadoop Combiner class for an MSCR. */
 class MscrCombiner[V2] extends HReducer[TaggedKey, TaggedValue, TaggedKey, TaggedValue] {
@@ -30,6 +31,7 @@ class MscrCombiner[V2] extends HReducer[TaggedKey, TaggedValue, TaggedKey, Tagge
   private var tv: TaggedValue = _
 
   override def setup(context: HReducer[TaggedKey, TaggedValue, TaggedKey, TaggedValue]#Context) = {
+    ScoobiEnvironment.setTaskContext(context)
     combiners = DistCache.pullObject[Combiners](context.getConfiguration, "scoobi.combiners").getOrElse(Map())
     tv = context.getMapOutputValueClass.newInstance.asInstanceOf[TaggedValue]
   }
