@@ -193,7 +193,7 @@ object VectorMode {
     sorted.zipWithIndex foreach { case (p, ix) => logger.debug(ix + ": " + p) }
 
     /* Concatenate */
-    val vec = Vector(sorted.flatMap(_ map { case (k, kvs) => (k, kvs.map(_._2).toIterable) }): _*)
+    val vec = Vector(sorted.flatMap(_ map { case (k, kvs) => (k, kvs.map(_._2).toIterable) }): _*).sortBy(_._1)(ord)
     logger.debug("computeGroupByKey: " + vec)
     vec
   }
