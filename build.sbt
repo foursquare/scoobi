@@ -1,8 +1,3 @@
-import com.jsuereth.sbtsite.SiteKeys._
-import com.jsuereth.git.{GitKeys,GitRunner}
-import GitKeys.{gitBranch, gitRemoteRepo}
-import com.jsuereth.ghpages.GhPages.ghpages._
-
 /** Definition */
 name := "scoobi"
 
@@ -48,19 +43,22 @@ testOptions := Seq(Tests.Filter(s => s.endsWith("Spec") ||
 
 fork in Test := true
 
-javaOptions ++= Seq("-Djava.security.krb5.realm=OX.AC.UK",
-                    "-Djava.security.krb5.kdc=kdc0.ox.ac.uk:kdc1.ox.ac.uk")
-
 /** Publishing */
-publishTo <<= version { v: String =>
-  val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else                             Some("staging" at nexus + "service/local/staging/deploy/maven2")
+publishTo <<= version { (v: String) =>
+  val nexus = "http://nexus.prod.foursquare.com/nexus/content/repositories/"
+  if (v.trim.endsWith("SNAPSHOT"))
+    Some("snapshots" at nexus + "thirdparty-snapshots/")
+  else
+    Some("releases"  at nexus + "thirdparty/")
 }
+
+credentials += Credentials(Path.userHome / ".ivy_credentials")
 
 publishMavenStyle := true
 
 publishArtifact in Test := false
+
+publishArtifact in packageDoc := false
 
 pomIncludeRepository := { x => false }
 
@@ -96,35 +94,4 @@ pomExtra := (
   </developers>
 )
 
-/** Site building */
-site.settings
 
-seq(site.settings:_*)
-
-siteSourceDirectory <<= target (_ / "specs2-reports")
-
-// depending on the version, copy the api files to a different directory
-siteMappings <++= (mappings in packageDoc in Compile, version) map { (m, v) =>
-  for((f, d) <- m) yield (f, if (v.trim.endsWith("SNAPSHOT")) ("api/master/" + d) else ("api/SCOOBI-"+v+"/"+d))
-}
-
-/** Site publication */
-seq(ghpages.settings:_*)
-
-// override the synchLocal task to avoid removing the existing files
-synchLocal <<= (privateMappings, updatedRepository, GitKeys.gitRunner, streams) map { (mappings, repo, git, s) =>
-  val betterMappings = mappings map { case (file, target) => (file, repo / target) }
-  IO.copy(betterMappings)
-  repo
-}
-
-git.remoteRepo := "git@github.com:NICTA/scoobi.git"
-
-/** Notification */
-seq(lsSettings :_*)
-
-(LsKeys.ghBranch in LsKeys.lsync) := Some("master-publish") 
-
-(LsKeys.ghUser in LsKeys.lsync) := Some("nicta")
-
-(LsKeys.ghRepo in LsKeys.lsync) := Some("scoobi")
