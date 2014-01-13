@@ -98,7 +98,7 @@ trait DList[A] {
     }
     parallelDo(dofn)
   }
-  
+
    /** Group the values of a distributed list with key-value elements by key. And explicitly
        take the grouping that should be used. This is best used when you're doing things like
        secondary sorts, or groupings with strange logic (like making sure None's / nulls are
@@ -131,6 +131,13 @@ trait DList[A] {
     basicParallelDo((input: A, emitter: Emitter[A]) => if (p(input)) {
       emitter.emit(input)
     })
+
+   def withFilter(p: A => Boolean) = new WithFilter(this, p)
+   final class WithFilter(self: DList[A], p: A => Boolean) {
+     def map[B: Manifest : WireFormat](f: A => B): DList[B] = self.filter(p).map(f)
+     def flatMap[B: Manifest : WireFormat](f: A => Iterable[B]): DList[B] = self.filter(p).flatMap(f)
+     def withFilter(q: A => Boolean): WithFilter = new WithFilter(self, x => p(x) && q(x))
+   }
 
   /**Keep elements from the distributed list that do not pass a specified predicate function. */
   def filterNot(p: A => Boolean): DList[A] = filter(p andThen (!_))
