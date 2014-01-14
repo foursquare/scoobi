@@ -3,7 +3,7 @@ name := "scoobi"
 
 organization := "com.nicta"
 
-version := "0.6.2-cdh4-fs-i"
+version := "0.6.2-cdh4-fs-j"
 
 scalaVersion := "2.10.3"
 
@@ -44,12 +44,44 @@ testOptions := Seq(Tests.Filter(s => s.endsWith("Spec") ||
 fork in Test := true
 
 /** Publishing */
-publishTo <<= version { (v: String) =>
-  val nexus = "http://nexus.prod.foursquare.com/nexus/content/repositories/"
-  if (v.trim.endsWith("SNAPSHOT"))
-    Some("snapshots" at nexus + "thirdparty-snapshots/")
-  else
-    Some("releases"  at nexus + "thirdparty/")
+publishTo <<= version { v: String =>
+  Some("thirdparty-releases" at "http://nexus.prod.foursquare.com/nexus/content/repositories/thirdparty/")
+}
+
+credentials ++= {
+  val sonatype = ("Sonatype Nexus Repository Manager", "nexus.prod.foursquare.com")
+    def loadMavenCredentials(file: java.io.File) : Seq[Credentials] = {
+      xml.XML.loadFile(file) \ "servers" \ "server" map (s => {
+          val host = (s \ "id").text
+          val realm = if (host == sonatype._2) sonatype._1 else "Unknown"
+          Credentials(realm, host, (s \ "username").text, (s \ "password").text)
+          })
+    }
+  val ivyCredentials   = Path.userHome / ".ivy2" / ".credentials"
+    val mavenCredentials = Path.userHome / ".m2"   / "settings.xml"
+    (ivyCredentials.asFile, mavenCredentials.asFile) match {
+      case (ivy, _) if ivy.canRead => Credentials(ivy) :: Nil
+        case (_, mvn) if mvn.canRead => loadMavenCredentials(mvn)
+        case _ => Nil
+    }
+}
+
+credentials ++= {
+  val sonatype = ("Sonatype Nexus Repository Manager", "nexus.prod.foursquare.com")
+    def loadMavenCredentials(file: java.io.File) : Seq[Credentials] = {
+      xml.XML.loadFile(file) \ "servers" \ "server" map (s => {
+          val host = (s \ "id").text
+          val realm = if (host == sonatype._2) sonatype._1 else "Unknown"
+          Credentials(realm, host, (s \ "username").text, (s \ "password").text)
+          })
+    }
+  val ivyCredentials   = Path.userHome / ".ivy2" / ".credentials"
+    val mavenCredentials = Path.userHome / ".m2"   / "settings.xml"
+    (ivyCredentials.asFile, mavenCredentials.asFile) match {
+      case (ivy, _) if ivy.canRead => Credentials(ivy) :: Nil
+        case (_, mvn) if mvn.canRead => loadMavenCredentials(mvn)
+        case _ => Nil
+    }
 }
 
 credentials += Credentials(Path.userHome / ".ivy_credentials")

@@ -20,7 +20,7 @@ package text
 import java.io.IOException
 import org.apache.commons.logging.LogFactory
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.Path
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.io.LongWritable
 import org.apache.hadoop.mapreduce.Job
@@ -130,7 +130,7 @@ object TextInput {
 
     def inputCheck(implicit sc: ScoobiConfiguration) {
       inputPaths foreach { p =>
-        if (Helper.pathExists(p)(sc))
+        if (Helper.pathExists(p)(sc) || FileSystem.get(p.toUri, sc.conf).isFile(p))
           logger.info("Input path: " + p.toUri.toASCIIString + " (" + Helper.sizeString(Helper.pathSize(p)(sc)) + ")")
         else
           throw new IOException("Input path " + p + " does not exist.")
